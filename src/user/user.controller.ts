@@ -31,17 +31,10 @@ import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 import { RestoreUserDto } from './dto/restore-user.dto';
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum';
 
-@ApiTags('User')
+@ApiTags('User (Test)')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @ApiOkResponse({ type: Boolean })
-  @ApiNotFoundResponse()
-  @Get('/checkUsername')
-  async checkUsername(@Query('username') username: string) {
-    return await this.userService.checkUsername(username);
-  }
 
   @ApiOperation({ summary: 'User register' })
   @ApiCreatedResponse({ type: User, description: 'Register' })
@@ -64,6 +57,13 @@ export class UserController {
     }
 
     throw new NotFoundException();
+  }
+
+  @ApiOkResponse({ type: Boolean })
+  @ApiNotFoundResponse()
+  @Get('/checkUsername')
+  async checkUsername(@Query('username') username: string) {
+    return await this.userService.checkUsername(username);
   }
 
   @ApiOkResponse({ type: PaginateResultUser })

@@ -3,14 +3,12 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NoticeService } from '../notice/notice.service';
-import { Item } from '../item/entities/item.entity';
-import { UpdateItemDto } from '../item/dto/update-item.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestoreUserDto } from './dto/restore-user.dto';
-import {PaginateQueryItemDto} from "../item/dto/paginate-query-item.dto";
-import {PaginateResultItem} from "../item/paginate/paginate-result-item.";
-import {PaginateQueryUserDto} from "./dto/paginate-query-user.dto";
-import {PaginateResultUser} from "./paginate/paginate-result-user.";
+import { PaginateQueryUserDto } from './dto/paginate-query-user.dto';
+import { PaginateResultUser } from './paginate/paginate-result-user.';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -65,7 +63,7 @@ describe('UserService', () => {
         ...item,
       } as User);
     }),
-    update: jest.fn().mockImplementation((id: number, dto: UpdateItemDto) => {
+    update: jest.fn().mockImplementation((id: number, dto: UpdateUserDto) => {
       if (id === 0) {
         return Promise.resolve({ affected: 0 });
       }
@@ -229,6 +227,52 @@ describe('UserService', () => {
       id = 0;
       expect(await service.findOne(id)).toBeUndefined();
       expect(mockUserRepository.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('should be updatePassword', () => {
+    const dto: UpdatePasswordUserDto = {
+      password: '111111',
+    } as UpdatePasswordUserDto;
+
+    it('should be positive', async () => {
+      expect(await service.updatePassword(1, dto)).toEqual(1);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(1, dto);
+    });
+
+    it('should be negative', async () => {
+      expect(await service.updatePassword(0, dto)).toEqual(0);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(1, dto);
+    });
+  });
+
+  describe('should be update', () => {
+    const dto: UpdateUserDto = {
+      id: 1,
+      email: '111111',
+    } as UpdateUserDto;
+
+    it('should be positive', async () => {
+      expect(await service.update(1, dto)).toEqual(1);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(1, dto);
+    });
+
+    it('should be negative', async () => {
+      dto.id = 0;
+      expect(await service.update(0, dto)).toEqual(0);
+      expect(mockUserRepository.update).toHaveBeenCalledWith(0, dto);
+    });
+  });
+
+  describe('should be remove', () => {
+    it('should be positive', async () => {
+      expect(await service.remove(1)).toEqual(1);
+      expect(mockUserRepository.delete).toHaveBeenCalledWith(1);
+    });
+
+    it('should be negative', async () => {
+      expect(await service.remove(0)).toEqual(0);
+      expect(mockUserRepository.delete).toHaveBeenCalledWith(0);
     });
   });
 });
