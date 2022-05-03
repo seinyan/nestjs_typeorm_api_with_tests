@@ -29,6 +29,7 @@ describe('AuthService', () => {
       user.password = '111111';
       await user.generatePasswordHash();
       user.email = 'test@test.ru';
+      user.isActive = true;
 
       return Promise.resolve(user);
     }),
@@ -120,6 +121,7 @@ describe('AuthService', () => {
       expect(await service.validateUser(email, '111111')).toEqual({
         id: expect.any(Number),
         email: email,
+        isActive: true,
       });
 
       expect(mockUserService.findByUsername).toHaveBeenCalledWith(email);

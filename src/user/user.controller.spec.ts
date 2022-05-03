@@ -82,38 +82,6 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('should be register', () => {
-    it('should be positive', async () => {
-      const dto: CreateUserDto = {
-        email: 'test@test.ru',
-        password: '1111111',
-      } as CreateUserDto;
-
-      expect(await controller.register(dto)).toEqual({
-        id: expect.any(Number),
-        email: dto.email,
-      } as User);
-
-      expect(mockUserService.register).toHaveBeenCalledWith(dto);
-    });
-  });
-
-  describe('should be restore ', () => {
-    const dto: RestoreUserDto = { username: 'test@test.ru' } as RestoreUserDto;
-    it('should be positive', async () => {
-      expect(await controller.restore(dto)).not.toBeDefined();
-      expect(mockUserService.restore).toHaveBeenCalledWith(dto);
-    });
-
-    it('should be negative', async () => {
-      dto.username = '0';
-      await expect(controller.restore(dto)).rejects.toThrowError(
-        NotFoundException,
-      );
-      expect(mockUserService.restore).toHaveBeenCalledWith(dto);
-    });
-  });
-
   describe('should be method pagination', () => {
     it('should be positive status Ok', async () => {
       const dto: PaginateQueryUserDto = new PaginateQueryUserDto();
@@ -181,7 +149,7 @@ describe('UserController', () => {
     it('should negative status NotFound', async () => {
       const id = '0';
       await expect(controller.updatePassword(id, dto)).rejects.toThrowError(
-          NotFoundException,
+        NotFoundException,
       );
       expect(mockUserService.updatePassword).toHaveBeenCalledWith(+id, dto);
     });

@@ -12,7 +12,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: ['.env.dev', '.env.test', '.env'],
       expandVariables: true,
       isGlobal: true,
       cache: false,
@@ -60,10 +60,10 @@ import { AuthModule } from './auth/auth.module';
         },
       }),
     }),
-    UserModule,
-    ItemModule,
-    NoticeModule,
     AuthModule,
+    UserModule,
+    NoticeModule,
+    ItemModule,
   ],
   controllers: [AppController],
   providers: [],
