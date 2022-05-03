@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { AppConfigureFunc } from '../src/main';
+import { AppModule } from './../src/app.module';
 import { UserLoginPassword } from './user-login-password';
 import { HttpStatus } from '@nestjs/common/enums/http-status.enum';
 import { LoginResultDto } from '../src/auth/result/login-result.dto';
+import { AppConfigure } from '../src/app-configure';
 
-describe('AppController (e2e)', () => {
+describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
   let accessToken = null;
@@ -19,7 +19,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    AppConfigureFunc(app);
+    AppConfigure(app);
     await app.init();
   });
 

@@ -1,13 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  HttpStatus,
+  INestApplication,
+} from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { AppConfigureFunc } from '../src/main';
+import { AppModule } from './../src/app.module';
 import { CreateItemDto } from '../src/item/dto/create-item.dto';
 import { Item } from '../src/item/entities/item.entity';
-import { UpdateItemDto } from '../src/item/dto/update-item.dto';
-import { PaginateQueryItemDto } from '../src/item/dto/paginate-query-item.dto';
-import { PaginateResultItem } from '../src/item/paginate/paginate-result-item.';
+import { Reflector } from '@nestjs/core';
+import { AppConfigure } from '../src/app-configure';
+import {UpdateItemDto} from "../src/item/dto/update-item.dto";
+import {PaginateResultItem} from "../src/item/paginate/paginate-result-item.";
+import {PaginateQueryItemDto} from "../src/item/dto/paginate-query-item.dto";
 
 describe('ItemController (e2e)', () => {
   let app: INestApplication;
@@ -18,7 +23,11 @@ describe('ItemController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    AppConfigureFunc(app);
+    AppConfigure(app);
+
+    app.useGlobalInterceptors(
+      new ClassSerializerInterceptor(app.get(Reflector)),
+    );
     await app.init();
   });
 

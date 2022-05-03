@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { AppConfigureFunc } from '../src/main';
+import { AppConfigure } from '../src/app-configure';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -13,7 +13,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    AppConfigureFunc(app);
+    AppConfigure(app);
     await app.init();
   });
 
