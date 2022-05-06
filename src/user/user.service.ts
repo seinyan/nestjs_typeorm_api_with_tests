@@ -43,7 +43,7 @@ export class UserService {
     await user.generatePasswordHash();
     await this.repository.save(user);
 
-    await this.noticeService.addEmailNotice(
+    await this.noticeService.sendEmail(
       user.email,
       'Thank you for registering',
       'user/register.hbs',
@@ -65,7 +65,7 @@ export class UserService {
       await user.generatePasswordHash();
       await this.repository.update(user.id, { password: user.password });
 
-      await this.noticeService.addEmailNotice(
+      await this.noticeService.sendEmail(
         user.email,
         'Restore password',
         'user/restore.hbs',

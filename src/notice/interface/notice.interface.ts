@@ -3,7 +3,7 @@ export interface INotice {
   sendTo: string; // email | phone ...
   otherId: number;
   status: number;
-  sendType: number;
+  type: string;
   template: string;
   subject: string;
   dataJson: string;

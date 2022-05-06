@@ -5,81 +5,52 @@ import { Paginate } from '../paginate';
 import { Notice } from './entities/notice.entity';
 import { PaginateResultNotice } from './paginate/paginate-result-notice.';
 import { PaginateQueryNoticeDto } from './dto/paginate-query-notice.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import {NoticeSendTypeEnum} from "./enums/notice-send-type.enum";
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { NoticeType } from './enums/notice-type.enum';
 
 @Injectable()
 export class NoticeService {
   constructor(
+    @InjectQueue('notice') private noticeQueue: Queue,
     @InjectRepository(Notice)
     private readonly noticeRepository: Repository<Notice>,
-    private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
   ) {}
 
   async paginate(dto: PaginateQueryNoticeDto): Promise<PaginateResultNotice> {
-    // await this.sendEmailTesting();
     return await Paginate(this.noticeRepository.createQueryBuilder('c'), dto);
   }
 
-  async addEmailNotice(
+  async test() {
+    await this.sendEmail(
+      this.configService.get('EMAIL_NORELY'),
+      // 'dsa dsa dsa',
+      'Testing send E-mail',
+      'email_testing.hbs',
+      { msg: 'Testing msg' },
+    );
+
+    return await this.noticeQueue.getJobCounts();
+  }
+
+  async sendEmail(
     email: string,
     subject: string,
     template: string,
     data?: any,
-  ): Promise<boolean> {
+  ): Promise<number | string> {
     const notice: Notice = new Notice();
-    notice.sendType = NoticeSendTypeEnum.Email;
     notice.sendFrom = this.configService.get('EMAIL_NORELY');
     notice.sendTo = email;
-    notice.subject = subject;
     notice.template = template;
-    notice.dataJson = JSON.stringify(data);
+    notice.subject = subject;
+    notice.data = data;
+    notice.dataJson = JSON.stringify(notice.data);
 
-    await this.noticeRepository.save(notice);
+    const { id } = await this.noticeQueue.add(NoticeType.Email, notice);
 
-    return true;
-  }
-
-  async sendEmailTesting() {
-    const notice: Notice = new Notice();
-    notice.sendTo = this.configService.get('EMAIL_NORELY');
-    notice.sendTo = 'Testing send E-mail';
-    notice.template = 'email_testing.hbs';
-    notice.dataJson = JSON.stringify({ msg: 'Testing msg' });
-
-    return await this.sendEmail(notice);
-  }
-
-  private async sendEmail(notice: Notice) {
-    let data = {};
-    if (notice.dataJson) {
-      data = JSON.parse(notice.dataJson);
-    }
-
-    console.log('=== sendEmail');
-    console.log({ notice });
-    console.log({ data });
-
-    // this.mailerService
-    //   .sendMail({
-    //     to: notice.sendTo,
-    //     from: this.configService.get('EMAIL_NORELY'),
-    //     subject: notice.subject,
-    //     template: process.cwd() + '/templates/emails/' + notice.template,
-    //     context: data,
-    //   })
-    //   .then((success) => {
-    //     console.log('success');
-    //     // notice.status = 'ok';
-    //     // this.noticeRepository.save(notice);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     // notice.status = 'err';
-    //     // notice.status = 'ok';
-    //     // this.noticeRepository.save(notice);
-    //   });
+    return id;
   }
 }

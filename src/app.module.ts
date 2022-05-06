@@ -8,9 +8,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemModule } from './item/item.module';
 import { NoticeModule } from './notice/notice.module';
 import { AuthModule } from './auth/auth.module';
+// @ts-ignore
 import type { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -24,16 +26,14 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        console.log(configService.get<number>('DATABASE_URL'));
         return {
-          // type: 'postgres',
-          url: configService.get<number>('DATABASE_URL'),
           // url: configService.get<number>('DATABASE_URL'),
-          // host: configService.get('DATABASE_HOST', '127.0.0.1'),
-          // port: configService.get<number>('DATABASE_PORT', 5432),
-          // username: configService.get('DATABASE_USER', 'postgres'),
-          // password: configService.get('DATABASE_PASS', '8888'),
-          // database: configService.get('DATABASE_NAME', 'nest_api'),
+          type: 'postgres',
+          host: configService.get('DATABASE_HOST', '127.0.0.1'),
+          port: configService.get<number>('DATABASE_PORT', 5432),
+          username: configService.get('DATABASE_USER', ''),
+          password: configService.get('DATABASE_PASS', ''),
+          database: configService.get('DATABASE_NAME', ''),
           entities: ['dist/**/*.entity{.ts,.js}'],
           synchronize: true, // sync db  -> create tables
           autoLoadEntities: true,
@@ -68,19 +68,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         },
       }),
     }),
-    // CacheModule.register<RedisClientOptions>({
-    //   ttl: 300000,
-    //   isGlobal: true,
-    //   store: redisStore,
-    //   socket: {
-    //     host: 'localhost',
-    //     port: 6379,
-    //   },
-    // }),
     CacheModule.registerAsync<RedisClientOptions>({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        ttl: configService.get('CACHE_TTL', 3000),
+        ttl: configService.get('CACHE_TTL', 5),
         isGlobal: true,
         store: redisStore,
         socket: {
@@ -89,6 +80,12 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         },
       }),
       inject: [ConfigService],
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
     }),
     AuthModule,
     UserModule,

@@ -18,7 +18,7 @@ export class AuthService {
   ) {}
 
   async login(user: User) {
-    await this.noticeService.addEmailNotice(
+    await this.noticeService.sendEmail(
       user.email,
       'You login',
       'auth/login.hbs',

@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PaginateQueryItemDto } from '../item/dto/paginate-query-item.dto';
@@ -13,5 +13,11 @@ export class NoticeController {
   @Get()
   async paginate(@Query() dto: PaginateQueryItemDto) {
     return await this.noticeService.paginate(dto);
+  }
+
+  @ApiOkResponse()
+  @Post('/test')
+  async test() {
+    return await this.noticeService.test();
   }
 }
