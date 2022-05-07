@@ -16,8 +16,8 @@ export class NoticeController {
   }
 
   @ApiOkResponse()
-  @Post('/test')
-  async test() {
-    return await this.noticeService.test();
+  @Post('/testing')
+  async testing() {
+    return await this.noticeService.testing();
   }
 }

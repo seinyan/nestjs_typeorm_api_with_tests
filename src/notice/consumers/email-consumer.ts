@@ -20,7 +20,7 @@ export class EmailConsumer {
     private readonly noticeRepository: Repository<Notice>,
   ) {}
 
-  @Process({ name: NoticeType.Email })
+  @Process({ name: NoticeType[NoticeType.Email] })
   async sendProcess(job: Job<Notice>, done: DoneCallback) {
     job.data.status = NoticeStatus.Process;
     job.data.attempt++;

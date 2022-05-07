@@ -16,6 +16,8 @@ services:
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASS=${DATABASE_PASS}
       - DATABASE_NAME=${DATABASE_NAME}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
     ports:
       - 3000:3000
       - 9229:9229
@@ -23,6 +25,7 @@ services:
       - nesjs-network
     depends_on:
       - postgres
+      - redis
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -52,13 +55,47 @@ services:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASS}
       - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
     ports:
       - "54321:5432"
     networks:
       - nesjs-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis_db
+    command: redis-server --appendonly yes
+    ports:
+      - 63791:6379
+    volumes:
+      - ./redis:/data
+    restart: always
+    networks:
+      - nesjs-network
+
+#  rabbitmq:
+#    image: rabbitmq:3-management-alpine
+#    container_name: 'rabbitmq'
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#    volumes:
+#      - ./rabbitmq/data/:/var/lib/rabbitmq/
+#      - ./rabbitmq/log/:/var/log/rabbitmq
+#    networks:
+#      - nesjs-network
 
 networks:
   nesjs-network:
 ##    driver: bridge
 ##  postgres:
 ##    driver: bridge
+#
+#volumes:
+#  db:
+#    driver: local
+#    external: true
+
+#volumes:
+#  pgdata:

@@ -70,22 +70,31 @@ import { BullModule } from '@nestjs/bull';
     }),
     CacheModule.registerAsync<RedisClientOptions>({
       imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        console.log(configService.get('REDIS_HOST', 'localhost'))
+        return {
+          ttl: configService.get('CACHE_TTL', 5),
+          isGlobal: true,
+          store: redisStore,
+          host: configService.get('REDIS_HOST', 'localhost'),
+          port: configService.get('REDIS_PORT', 6379),
+          // socket: {
+          //   host: configService.get('REDIS_HOST', ''),
+          //   port: configService.get('REDIS_PORT', 6379),
+          // },
+        }
+      },
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        ttl: configService.get('CACHE_TTL', 5),
-        isGlobal: true,
-        store: redisStore,
-        socket: {
+        redis: {
           host: configService.get('REDIS_HOST', 'localhost'),
           port: configService.get('REDIS_PORT', 6379),
         },
       }),
       inject: [ConfigService],
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
     }),
     AuthModule,
     UserModule,

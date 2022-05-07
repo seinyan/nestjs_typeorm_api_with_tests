@@ -19,11 +19,7 @@ export class NoticeService {
     private readonly configService: ConfigService,
   ) {}
 
-  async paginate(dto: PaginateQueryNoticeDto): Promise<PaginateResultNotice> {
-    return await Paginate(this.noticeRepository.createQueryBuilder('c'), dto);
-  }
-
-  async test() {
+  async testing() {
     await this.sendEmail(
       this.configService.get('EMAIL_NORELY'),
       // 'dsa dsa dsa',
@@ -35,6 +31,10 @@ export class NoticeService {
     return await this.noticeQueue.getJobCounts();
   }
 
+  async paginate(dto: PaginateQueryNoticeDto): Promise<PaginateResultNotice> {
+    return await Paginate(this.noticeRepository.createQueryBuilder('c'), dto);
+  }
+
   async sendEmail(
     email: string,
     subject: string,
@@ -42,6 +42,7 @@ export class NoticeService {
     data?: any,
   ): Promise<number | string> {
     const notice: Notice = new Notice();
+    notice.type = NoticeType.Email;
     notice.sendFrom = this.configService.get('EMAIL_NORELY');
     notice.sendTo = email;
     notice.template = template;
@@ -49,7 +50,10 @@ export class NoticeService {
     notice.data = data;
     notice.dataJson = JSON.stringify(notice.data);
 
-    const { id } = await this.noticeQueue.add(NoticeType.Email, notice);
+    const { id } = await this.noticeQueue.add(
+      NoticeType[NoticeType.Email],
+      notice,
+    );
 
     return id;
   }

@@ -38,8 +38,8 @@ export class Notice extends AppBaseEntity implements INotice {
   status: number;
 
   @ApiProperty()
-  @Column({ type: 'varchar', name: 'type', nullable: true })
-  type: string;
+  @Column({ type: 'integer', name: 'type', nullable: true })
+  type: number;
 
   @ApiProperty()
   @Column({ type: 'varchar', name: 'subject', nullable: true })

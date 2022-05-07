@@ -1,4 +1,3 @@
 export enum NoticeType {
-  Email = 'email',
-  Sms = 'sms',
+  Email = 1,
 }

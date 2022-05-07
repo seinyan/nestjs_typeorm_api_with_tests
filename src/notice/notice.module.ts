@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notice } from './entities/notice.entity';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import { EmailConsumer } from './queues/email-consumer';
+import { EmailConsumer } from './consumers/email-consumer';
 
 @Module({
   imports: [
