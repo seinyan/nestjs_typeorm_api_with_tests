@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   dev:
-    container_name: nestjs_api_dev
+    container_name: api_dev
     image: nestjs-api-dev:1.0.0
     working_dir: /usr/src/app
     build:
       context: .
       target: development
       dockerfile: ./Dockerfile
-    command: npm run start:debug
+    command: npm run start:dev
     environment:
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
@@ -18,18 +18,20 @@ services:
       - DATABASE_NAME=${DATABASE_NAME}
       - REDIS_HOST=redis
       - REDIS_PORT=${REDIS_PORT}
+      - RABBITMQ_URL=amqp://rabbitmq:5672
     ports:
       - 3000:3000
-      - 9229:9229
     networks:
       - nesjs-network
     depends_on:
       - postgres
       - redis
+      - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     restart: unless-stopped
+
   prod:
     container_name: nestjs_api_prod
     image: nestjs-api-prod:1.0.0
@@ -40,7 +42,6 @@ services:
     command: npm run start:prod
     ports:
       - 3000:3000
-      - 9229:9229
     networks:
       - nesjs-network
     volumes:
@@ -50,6 +51,7 @@ services:
 
   postgres:
     image: postgres:14.2
+    container_name: postgres
     restart: always
     environment:
       - POSTGRES_USER=${DATABASE_USER}
@@ -74,28 +76,18 @@ services:
     networks:
       - nesjs-network
 
-#  rabbitmq:
-#    image: rabbitmq:3-management-alpine
-#    container_name: 'rabbitmq'
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
-#    volumes:
-#      - ./rabbitmq/data/:/var/lib/rabbitmq/
-#      - ./rabbitmq/log/:/var/log/rabbitmq
-#    networks:
-#      - nesjs-network
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_nest
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbitmq_d/:/var/lib/rabbitmq/
+    #      - ./rabbitmq_log/log/:/var/log/rabbitmq/
+    networks:
+      - nesjs-network
 
 networks:
   nesjs-network:
-##    driver: bridge
-##  postgres:
-##    driver: bridge
-#
-#volumes:
-#  db:
-#    driver: local
-#    external: true
-
-#volumes:
-#  pgdata:

@@ -10,7 +10,7 @@ RUN npm install --only=development
 
 COPY . .
 
-RUN npm run build
+#RUN npm run build
 
 FROM node:14-alpine as production
 
@@ -25,7 +25,7 @@ RUN npm install --only=production
 
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
+#COPY --from=development /usr/src/app/dist ./dist
 
 
 CMD ["node", "dist/main"]

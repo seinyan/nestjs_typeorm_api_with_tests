@@ -15,7 +15,7 @@ describe('AuthService', () => {
   let service: AuthService;
 
   const mockNoticeService = {
-    addEmailNotice: jest.fn(
+    sendEmail: jest.fn(
       (email: string, subject: string, template: string, data?: any) => {
         return Promise.resolve(true);
       },
@@ -87,7 +87,7 @@ describe('AuthService', () => {
         refreshToken: expect.any(String),
       } as LoginResultDto);
 
-      expect(mockNoticeService.addEmailNotice).toHaveBeenCalledWith(
+      expect(mockNoticeService.sendEmail).toHaveBeenCalledWith(
         user.email,
         expect.any(String),
         expect.any(String),

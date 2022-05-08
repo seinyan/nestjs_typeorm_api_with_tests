@@ -14,7 +14,7 @@ describe('UserService', () => {
   let service: UserService;
 
   const mockNoticeService = {
-    addEmailNotice: jest.fn(
+    sendEmail: jest.fn(
       (email: string, subject: string, template: string, data?: any) => {
         return Promise.resolve(true);
       },
@@ -162,7 +162,7 @@ describe('UserService', () => {
 
       expect(mockUserRepository.create).toHaveBeenCalledWith(dto);
       expect(mockUserRepository.save).toHaveBeenCalled();
-      expect(mockNoticeService.addEmailNotice).toHaveBeenCalledWith(
+      expect(mockNoticeService.sendEmail).toHaveBeenCalledWith(
         dto.email,
         expect.any(String),
         expect.any(String),
@@ -185,7 +185,7 @@ describe('UserService', () => {
         password: expect.any(String),
       });
 
-      expect(mockNoticeService.addEmailNotice).toHaveBeenCalledWith(
+      expect(mockNoticeService.sendEmail).toHaveBeenCalledWith(
         dto.username,
         expect.any(String),
         expect.any(String),

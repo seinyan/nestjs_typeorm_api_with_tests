@@ -4,7 +4,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PaginateQueryItemDto } from '../item/dto/paginate-query-item.dto';
 import { PaginateResultNotice } from './paginate/paginate-result-notice.';
 
-@ApiTags('Notice (Test not full functional)')
+@ApiTags('Notice (Test)')
 @Controller('notice')
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}

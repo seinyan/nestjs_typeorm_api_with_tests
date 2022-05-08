@@ -13,6 +13,9 @@ import type { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ScheduleModule } from '@nestjs/schedule';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -60,7 +63,8 @@ import { BullModule } from '@nestjs/bull';
           from: configService.get('EMAIL_NORELY'),
         },
         template: {
-          dir: process.cwd() + '/templates/emails/',
+          // dir: process.cwd() + '/templates/emails/',
+          dir: join(__dirname, './templates/emails/'),
           adapter: new HandlebarsAdapter(), // or new PugAdapter(),
           options: {
             strict: true,
@@ -71,7 +75,6 @@ import { BullModule } from '@nestjs/bull';
     CacheModule.registerAsync<RedisClientOptions>({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        console.log(configService.get('REDIS_HOST', 'localhost'))
         return {
           ttl: configService.get('CACHE_TTL', 5),
           isGlobal: true,
@@ -82,7 +85,7 @@ import { BullModule } from '@nestjs/bull';
           //   host: configService.get('REDIS_HOST', ''),
           //   port: configService.get('REDIS_PORT', 6379),
           // },
-        }
+        };
       },
       inject: [ConfigService],
     }),
@@ -96,6 +99,26 @@ import { BullModule } from '@nestjs/bull';
       }),
       inject: [ConfigService],
     }),
+    ClientsModule.registerAsync([
+      {
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        name: 'GREETING_SERVICE',
+        useFactory: async (configService: ConfigService) => ({
+          name: 'GREETING_SERVICE',
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get('RABBITMQ_URL').toString()],
+            queue: 'cats_queue_1',
+            noAck: false,
+            queueOptions: {
+              durable: false,
+            },
+          },
+        }),
+      },
+    ]),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     NoticeModule,
@@ -141,3 +164,18 @@ export class AppModule {}
 //   autoLoadEntities: true,
 //   logging: false,
 // }),
+
+// ClientsModule.register([
+//   {
+//     name: 'GREETING_SERVICE',
+//     transport: Transport.RMQ,
+//     options: {
+//       urls: ['amqp://localhost:5672'],
+//       queue: 'cats_queue_1',
+//       noAck: false,
+//       queueOptions: {
+//         durable: false,
+//       },
+//     },
+//   },
+// ]),

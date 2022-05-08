@@ -13,10 +13,10 @@ import { NoticeType } from './enums/notice-type.enum';
 @Injectable()
 export class NoticeService {
   constructor(
-    @InjectQueue('notice') private noticeQueue: Queue,
     @InjectRepository(Notice)
     private readonly noticeRepository: Repository<Notice>,
     private readonly configService: ConfigService,
+    @InjectQueue('notice') private noticeQueue: Queue,
   ) {}
 
   async testing() {
@@ -40,7 +40,7 @@ export class NoticeService {
     subject: string,
     template: string,
     data?: any,
-  ): Promise<number | string> {
+  ): Promise<string> {
     const notice: Notice = new Notice();
     notice.type = NoticeType.Email;
     notice.sendFrom = this.configService.get('EMAIL_NORELY');
@@ -55,6 +55,6 @@ export class NoticeService {
       notice,
     );
 
-    return id;
+    return id.toString();
   }
 }

@@ -11,6 +11,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NoticeStatus } from '../enums/notice-status.enum';
+import { join } from 'path';
 
 @Processor('notice')
 export class EmailConsumer {
@@ -30,7 +31,7 @@ export class EmailConsumer {
         to: job.data.sendTo,
         from: job.data.sendFrom,
         subject: job.data.subject,
-        template: job.data.template,
+        template: './templates/emails/' + job.data.template,
         context: job.data.data,
       });
 
